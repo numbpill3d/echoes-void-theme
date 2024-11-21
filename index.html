@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NUMBPILLED - Hacker Terminal Desktop</title>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'VT323', monospace;
+            background-color: #000;
+            color: #ff0000;
+            overflow: hidden;
+        }
+        .window {
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.8);
+            border: 1px solid #ff0000;
+            box-shadow: 0 0 10px #ff0000;
+            overflow: hidden;
+            z-index: 10;
+        }
+        .window-header {
+            background-color: rgba(255, 0, 0, 0.2);
+            padding: 5px;
+            cursor: move;
+            display: flex;
+            justify-content: space-between;
+        }
+        .window-content {
+            padding: 10px;
+            overflow-y: auto;
+            max-height: calc(100% - 30px);
+        }
+        .close-btn {
+            cursor: pointer;
+            color: #ff0000;
+        }
+        #main-window {
+            width: 600px;
+            height: 400px;
+            top: 50px;
+            left: 50px;
+        }
+        #sidebar-window {
+            width: 300px;
+            height: 500px;
+            top: 50px;
+            right: 50px;
+        }
+        #links-window {
+            width: 200px;
+            height: 300px;
+            top: 200px;
+            left: 400px;
+        }
+        .tab-container {
+            display: flex;
+            border-bottom: 1px solid #ff0000;
+        }
+        .tab {
+            padding: 5px 10px;
+            cursor: pointer;
+            border: 1px solid #ff0000;
+            border-bottom: none;
+            margin-right: 5px;
+        }
+        .tab.active {
+            background-color: rgba(255, 0, 0, 0.2);
+        }
+        .tab-content {
+            display: none;
+            padding: 10px;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-gap: 10px;
+            margin-top: 10px;
+        }
+        .grid-item {
+            border: 1px solid #ff0000;
+            padding: 10px;
+        }
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        .marquee {
+            position: fixed;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 5px 0;
+            font-style: italic;
+            text-shadow: 0 0 5px #ff0000;
+            border: 1px solid #ff0000;
+            z-index: 1000;
+        }
+        .top-marquee {
+            top: 0;
+            border-bottom: 1px solid #ff0000;
+        }
+        .bottom-marquee {
+            bottom: 0;
+            border-top: 1px solid #ff0000;
+        }
+        .blink {
+            animation: blink 1s steps(1, end) infinite;
+        }
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        .image-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        .gallery-image {
+            width: 30%;
+            margin-bottom: 10px;
+            border: 1px solid #ff0000;
+            transition: all 0.3s ease;
+        }
+        .gallery-image:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px #ff0000;
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container"></div>
+    <div class="marquee top-marquee">
+        <marquee behavior="scroll" direction="left">Welcome to the realm of forgotten dreams and shattered realities... <span class="blink">_</span></marquee>
+    </div>
+    
+    <div id="main-window" class="window">
+        <div class="window-header">
+            <span>Main Content</span>
+            <span class="close-btn">×</span>
+        </div>
+        <div class="window-content">
+            <div class="tab-container">
+                <div class="tab active" data-tab="tab1">Tab 1</div>
+                <div class="tab" data-tab="tab2">Tab 2</div>
+                <div class="tab" data-tab="tab3">Tab 3</div>
+            </div>
+            <div class="tab-content active" id="tab1">
+                <h2>Echoes in the Void</h2>
+                <div class="grid-container">
+                    <div class="grid-item">
+                        <h3>Whispers</h3>
+                        <p>The shadows dance, forming intricate patterns that tell stories of forgotten realms.</p>
+                    </div>
+                    <div class="grid-item">
+                        <h3>Echoes</h3>
+                        <p>Voices from the past reverberate through the corridors of time, carrying fragments of lost memories.</p>
+                    </div>
+                    <div class="grid-item">
+                        <h3>Visions</h3>
+                        <p>Glimpses of alternate realities flicker at the edge of consciousness, tantalizing and elusive.</p>
+                    </div>
+                    <div class="grid-item">
+                        <h3>Dreams</h3>
+                        <p>In the realm between waking and sleeping, truths reveal themselves in cryptic symbols.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-content" id="tab2">
+                <h2>Fractured Reflections</h2>
+                <p>The mirror cracked today, not from any physical force, but from the weight of the realities it reflected. In each shard, I saw a different version of myself, living lives I could only imagine. Which one is the real me? Are any of them real?</p>
+            </div>
+            <div class="tab-content" id="tab3">
+                <h2>Timeless Boundaries</h2>
+                <p>I found an old clock in the attic, its hands spinning wildly, defying the laws of time. As I watched, mesmerized, I felt years passing in seconds, and seconds stretching into eternities. The boundaries between past, present, and future blurred into a singular, incomprehensible moment.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="sidebar-window" class="window">
+        <div class="window-header">
+            <span>Sidebar</span>
+            <span class="close-btn">×</span>
+        </div>
+        <div class="window-content">
+            <h2>Fragments of Reality <span class="blink">_</span></h2>
+            <p>In this corner of the void, we collect the scattered pieces of dreams and nightmares alike. Each image, each word, is a window into a world beyond our comprehension.</p>
+            <div class="image-gallery">
+                <img src="https://files.catbox.moe/dohjxg.jpg" alt="Surreal Image 1" class="gallery-image">
+                <img src="https://files.catbox.moe/2vqmr4.gif" alt="Surreal Image 2" class="gallery-image">
+                <img src="https://files.catbox.moe/wpc6re.jpg" alt="Surreal Image 3" class="gallery-image">
+            </div>
+            <h3>Whispers from the Abyss</h3>
+            <p>Listen closely, and you might hear the secrets of the universe in the static between thoughts. The void speaks to those who dare to listen, revealing truths that defy explanation.</p>
+        </div>
+    </div>
+
+    <div id="links-window" class="window">
+        <div class="window-header">
+            <span>Links</span>
+            <span class="close-btn">×</span>
+        </div>
+        <div class="window-content">
+            <h3>Portals to Other Realms</h3>
+            <ul>
+                <li><a href="#">The Whispering Void</a></li>
+                <li><a href="#">Echoes of Eternity</a></li>
+                <li><a href="#">Fractured Mirrors</a></li>
+                <li><a href="#">Timeless Paradox</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="marquee bottom-marquee">
+        <marquee behavior="scroll" direction="right">The boundaries of reality are but a thin veil, easily torn by the weight of our dreams... <span class="blink">_</span></marquee>
+    </div>
+
+    <script>
+        // Three.js setup for ambient background effect
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        // Create particles
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 5000;
+        const posArray = new Float32Array(particlesCount * 3);
+
+        for (let i = 0; i < particlesCount * 3; i++) {
+            posArray[i] = (Math.random() - 0.5) * 5;
+        }
+
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+
+        const particlesMaterial = new THREE.PointsMaterial({
+            size: 0.005,
+            color: 0xff0000,
+            transparent: true,
+            opacity: 0.5,
+        });
+
+        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particlesMesh);
+
+        camera.position.z = 3;
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            particlesMesh.rotation.y += 0.001;
+            particlesMesh.rotation.x += 0.0005;
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Resize handler
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Draggable functionality
+        function makeDraggable(elmnt) {
+            var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            elmnt.querySelector('.window-header').onmousedown = dragMouseDown;
+
+            function dragMouseDown(e) {
+                e = e || window.event;
+                e.preventDefault();
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                document.onmouseup = closeDragElement;
+                document.onmousemove = elementDrag;
+            }
+
+            function elementDrag(e) {
+                e = e || window.event;
+                e.preventDefault();
+                pos1 = pos3 - e.clientX;
+                pos2 = pos4 - e.clientY;
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+                elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+            }
+
+            function closeDragElement() {
+                document.onmouseup = null;
+                document.onmousemove = null;
+            }
+        }
+
+        // Make windows draggable
+        document.querySelectorAll('.window').forEach(makeDraggable);
+
+        // Close button functionality
+        document.querySelectorAll('.close-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.closest('.window').style.display = 'none';
+            });
+        });
+
+        // Tab functionality
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const tabId = this.getAttribute('data-tab');
+                this.parentNode.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                this.closest('.window-content').querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+
+        // Subtle text animation
+        function animateText() {
+            const textElements = document.querySelectorAll('p, h1, h2, h3');
+            textElements.forEach(el => {
+                if (Math.random() < 0.01) { // Reduce frequency of animation
+                    el.style.textShadow = `0 0 ${Math.random() * 10}px #ff0000`;
+                    setTimeout(() => {
+                        el.style.textShadow = '0 0 5px #ff0000';
+                    }, Math.random() * 1000 + 500);
+                }
+            });
+            requestAnimationFrame(animateText);
+        }
+        animateText();
+    </script>
+</body>
+</html>
